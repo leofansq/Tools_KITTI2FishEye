@@ -1,1 +1,1 @@
-dir *.* /b> ÎÄµµÁÐ±í.txt
+dir *.* /b> filename_list.txt

@@ -13,7 +13,9 @@
 ## Implementation (Windows) ##
 
 ### For Batch Processing ###
-* Get The List of Filename：Put the [get_list.bat](/get_list.bat) into the file and click. The list of filename is written into the .txt file.*Don't forget to delete the filename 'get_list.bat' from the list by yourself!*
+* Get The List of Filename：Put the [get_list.bat](/get_list.bat) into the file and click. The list of filename is written into the 'filename_list.txt' file. 
+
+	*Don't forget to delete the filename 'get_list.bat' from the list by yourself!*
 * Adjust the parameters and Run the programe in Batch-Processing Mode
 
 ### For Single Picture ###
