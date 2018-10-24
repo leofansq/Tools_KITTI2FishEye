@@ -1,21 +1,10 @@
-/************************************************************************
-*	fisheye calibration
-*	author ZYF
-*	date 2014/11/22
-************************************************************************/
-//Ä£ĞÍµÄ²Î¿¼ÂÛÎÄ¸½ÔÚÎÄ¼ş¼ĞÖĞ
-//releaseÄ£Ê½ÔËĞĞ»áµ¼ÖÂÊä³öÍ¼Ïñ±³¾°²»ÎªºÚÉ«£¨ÕâĞ©µØ·½°´ÀíÀ´ËµÃ»ÓĞÌî³äÏñËØ£©£¬debugÄ£Ê½ÎŞ´ËÎÊÌâ
-
-// FSQ¸üĞÂ²¿·Ö£ºĞŞÕıÁËUndisImage²¿·Ö£¬Íê³ÉÁËLabel×ª»»º¯ÊıLabelTrans¼°ÆäËùµ÷ÓÃµÄ×ø±ê×ª»»º¯ÊıLabelPoint
-//				ÊµÏÖÁËÍ¼Æ¬×ª»»ºÍLabel×ª»»µÄÅúÁ¿´¦Àímain
-
+//releaseæ¨¡å¼è¿è¡Œä¼šå¯¼è‡´è¾“å‡ºå›¾åƒèƒŒæ™¯ä¸ä¸ºé»‘è‰²ï¼ˆè¿™äº›åœ°æ–¹æŒ‰ç†æ¥è¯´æ²¡æœ‰å¡«å……åƒç´ ï¼‰ï¼Œdebugæ¨¡å¼æ— æ­¤é—®é¢˜
 #include "fisheye.h"
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-//ÅúÁ¿´¦Àí fsq2018.2.4
+//æ‰¹é‡å¤„ç† fsq2018.2.4
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -31,7 +20,7 @@ using namespace std;
 #endif
 /************************************************************************/
 /* PointMap
-/* ½«Ò»¸öÓãÑÛÍ¼ÏñÉÏµÄµãÓÃµÈ¾àÄ£ĞÍÓ³Éäµ½µ¥Î»ÇòÃæ
+/* å°†ä¸€ä¸ªé±¼çœ¼å›¾åƒä¸Šçš„ç‚¹ç”¨ç­‰è·æ¨¡å‹æ˜ å°„åˆ°å•ä½çƒé¢
 /************************************************************************/
 void PointMap(Point2f sp, Point2f &dp, float r)
 {
@@ -40,33 +29,33 @@ void PointMap(Point2f sp, Point2f &dp, float r)
 
 /************************************************************************/
 /* PointMap
-/* ½«Ò»¸öÓãÑÛÍ¼ÏñÉÏµÄµãÓÃµÈ¾àÄ£ĞÍÓ³Éäµ½µ¥Î»ÇòÃæ
-/* ²ÎÊı£º
-/*		x,y: ÊäÈë²ÎÊı£¬»û±äÍ¼ÏñÉÏµÄµãµÄ×ø±ê
-/*		new_x, new_y : Êä³ö²ÎÊı£¬µ¥Î»ÇòÃæÉÏµãµÄ×ø±ê
-		theta_max ÓãÑÛ¾µÍ·ÊÓ³¡½Ç
-		r  ÖÆ×÷µÄÓãÑÛÍ¼Ïñ°ë¾¶
+/* å°†ä¸€ä¸ªé±¼çœ¼å›¾åƒä¸Šçš„ç‚¹ç”¨ç­‰è·æ¨¡å‹æ˜ å°„åˆ°å•ä½çƒé¢
+/* å‚æ•°ï¼š
+/*		x,y: è¾“å…¥å‚æ•°ï¼Œç•¸å˜å›¾åƒä¸Šçš„ç‚¹çš„åæ ‡
+/*		new_x, new_y : è¾“å‡ºå‚æ•°ï¼Œå•ä½çƒé¢ä¸Šç‚¹çš„åæ ‡
+		theta_max é±¼çœ¼é•œå¤´è§†åœºè§’
+		r  åˆ¶ä½œçš„é±¼çœ¼å›¾åƒåŠå¾„
 /************************************************************************/
-void PointMap(float x, float y, float& new_x, float& new_y,float r)//×¢ÊÍ²¿·Ö¿ÉÒÔÓÃÓÚÊµÏÖÍ¼ÏñÒÆÎ»
+void PointMap(float x, float y, float& new_x, float& new_y,float r)//æ³¨é‡Šéƒ¨åˆ†å¯ä»¥ç”¨äºå®ç°å›¾åƒç§»ä½
 {
-	float l = sqrt(x*x + y*y);   //ÓãÑÛÍ¼ÉÏÄ³µã¾àÖĞĞÄ¾àÀë	
-	float theta_max = PI/2 ;     //ÓãÑÛ¾µÍ·°ëÊÓ³¡½Ç
+	float l = sqrt(x*x + y*y);   //é±¼çœ¼å›¾ä¸ŠæŸç‚¹è·ä¸­å¿ƒè·ç¦»	
+	float theta_max = PI/2 ;     //é±¼çœ¼é•œå¤´åŠè§†åœºè§’
 	
-	//float x0 = 0;Ô­Í¼ÒÆ¶¯ÏñËØÁ¿
+	//float x0 = 0;åŸå›¾ç§»åŠ¨åƒç´ é‡
 	//float y0 = 0;
 	//float theta_change = atan2(y0 , x0);
 	//float l_change = sqrt(x0*x0 + y0*y0);
 
-	//¼«×ø±ê½Çalpha
+	//æåæ ‡è§’alpha
 	float alpha(0);
 	if ( 0 == x) 
 		alpha = PI / 2;
 	else 
 		alpha = atan2( y,x);
 
-	float f = r / theta_max;    //ÓÃµÈ¾àÍ¶Ó°µÄ·½Ê½¼ÆËã½¹¾àf
-	float theta = l / f;        //ÓãÑÛÍ¼Ó³Éäµ½µ¥Î»Ô²£¨theta = r/f£¬µ¥Î»Ô²r=1£©
-	float d = f*tan(theta);     //µ¥Î»Ô²Ó³Éäµ½Ô­Í¼
+	float f = r / theta_max;    //ç”¨ç­‰è·æŠ•å½±çš„æ–¹å¼è®¡ç®—ç„¦è·f
+	float theta = l / f;        //é±¼çœ¼å›¾æ˜ å°„åˆ°å•ä½åœ†ï¼ˆtheta = r/fï¼Œå•ä½åœ†r=1ï¼‰
+	float d = f*tan(theta);     //å•ä½åœ†æ˜ å°„åˆ°åŸå›¾
 
 	//float tx = d* cos(alpha)-l_change*cos(theta_change);
 	//float ty = d* sin(alpha) - l_change*sin(theta_change);
@@ -76,7 +65,7 @@ void PointMap(float x, float y, float& new_x, float& new_y,float r)//×¢ÊÍ²¿·Ö¿ÉÒ
 	//new_x = tx;
 	//new_y = ty;
 
-	//ÕâÒ»¶ÎÈ¥µô»áµ¼ÖÂÍ¼ÏñÖĞÏß´¦ÓĞ´íÎ»
+	//è¿™ä¸€æ®µå»æ‰ä¼šå¯¼è‡´å›¾åƒä¸­çº¿å¤„æœ‰é”™ä½
 	if ( x > 0)
 		new_x = abs(tx);
 	else if (x < 0)
@@ -93,12 +82,12 @@ void PointMap(float x, float y, float& new_x, float& new_y,float r)//×¢ÊÍ²¿·Ö¿ÉÒ
 }
 
 /************************************************************************/
-/* PointMap2   Î´Ê¹ÓÃ
-/* ½«Ò»¸ö½ÃÕıÍ¼ÏñÉÏµÄµãÓ³Éäµ½»û±äÍ¼ÏñÉÏµÄÒ»¸öµã£¬Ê¹ÓÃÎ³¶È²»±ä·¨Ó³Éä
-/* ²ÎÊı£º
-/*		x,y: ÊäÈë²ÎÊı£¬´ı½ÃÕıÍ¼ÏñÉÏµÄµãµÄ×ø±ê
-/*		new_x, new_y : Êä³ö²ÎÊı£¬»û±äÍ¼ÏñÉÏµãµÄ×ø±ê
-/*		r : ÊäÈë²ÎÊı£¬Ô²°ë¾¶
+/* PointMap2   æœªä½¿ç”¨
+/* å°†ä¸€ä¸ªçŸ«æ­£å›¾åƒä¸Šçš„ç‚¹æ˜ å°„åˆ°ç•¸å˜å›¾åƒä¸Šçš„ä¸€ä¸ªç‚¹ï¼Œä½¿ç”¨çº¬åº¦ä¸å˜æ³•æ˜ å°„
+/* å‚æ•°ï¼š
+/*		x,y: è¾“å…¥å‚æ•°ï¼Œå¾…çŸ«æ­£å›¾åƒä¸Šçš„ç‚¹çš„åæ ‡
+/*		new_x, new_y : è¾“å‡ºå‚æ•°ï¼Œç•¸å˜å›¾åƒä¸Šç‚¹çš„åæ ‡
+/*		r : è¾“å…¥å‚æ•°ï¼Œåœ†åŠå¾„
 /************************************************************************/
 void PointMap2(float x, float y, float& new_x, float& new_y, float r)
 {
@@ -107,8 +96,8 @@ void PointMap2(float x, float y, float& new_x, float& new_y, float r)
 	float theta_y = y / r;
 	float yy = r * sin(theta_y);
 
-	//µü´ú¸üĞÂxx,yy
-	float scale = 1.0f; // x,y×ø±êµÄËõ·Å±ÈÀı£¬Ä¬ÈÏÎª1£¬µ÷Õû´Ë²ÎÊı»á¸Ä±äÓ³Éä½á¹û
+	//è¿­ä»£æ›´æ–°xx,yy
+	float scale = 1.0f; // x,yåæ ‡çš„ç¼©æ”¾æ¯”ä¾‹ï¼Œé»˜è®¤ä¸º1ï¼Œè°ƒæ•´æ­¤å‚æ•°ä¼šæ”¹å˜æ˜ å°„ç»“æœ
 	int iters = 0;//
 	for (int i = 0; i < iters; ++i) {
 		float rr = sqrt(r*r - yy*yy);
@@ -130,44 +119,44 @@ void PointMap2(float x, float y, float& new_x, float& new_y, float r)
 }
 
 /************************************************************************/
-/* Éú³É´ÓÔ­Í¼Ïñµ½ÓãÑÛÍ¼ÏñµÄ×ø±êµÄÓ³Éä¾ØÕómapx mapy  
-²ÎÊı£º
-	r £º Ô²°ë¾¶£¬ÓãÑÛÍ¼Ïñ°ë¾¶
+/* ç”Ÿæˆä»åŸå›¾åƒåˆ°é±¼çœ¼å›¾åƒçš„åæ ‡çš„æ˜ å°„çŸ©é˜µmapx mapy  
+å‚æ•°ï¼š
+	r ï¼š åœ†åŠå¾„ï¼Œé±¼çœ¼å›¾åƒåŠå¾„
 /************************************************************************/
 void RectifyMap(Mat& mapx, Mat& mapy, float r)
 {
-	//int width = ceil(PI * r / 2) * 2;//ceilº¯Êı£ºÈ¡´óÓÚµÈÓÚ±í´ïÊ½µÄ×îĞ¡ÕûÊı
+	//int width = ceil(PI * r / 2) * 2;//ceilå‡½æ•°ï¼šå–å¤§äºç­‰äºè¡¨è¾¾å¼çš„æœ€å°æ•´æ•°
 
-	//ÕâÀïÉèÖÃÁË±ä»»¾ØÕóµÄ´óĞ¡£¬Ö®ºóµÄÊä³öÍ¼ÏñºÍ±ä»»¾ØÕóÍ¬Ñù´ó
-	//int width = 1000; //Ó³ÉäÍ¼ÏñµÄ¿í¶È
-	//float s = 480.0f / 720.0f; //Í¼Ïñ¸ßºÍ¿íµÄ±ÈÀı
-
-
-	//³¢ÊÔ¸Ä±äÉú³ÉÓãÑÛÍ¼Ïñ³¤¿í±È2018.7.10  ·ÇÅúÁ¿´¦ÀímainÖĞÒ²ÓĞ²ÎÊı¸Ä¶¯
-	int width = 1224; //Ó³ÉäÍ¼ÏñµÄ¿í¶È
-	float s = 480.0f / 720.0f; //Í¼Ïñ¸ßºÍ¿íµÄ±ÈÀı
+	//è¿™é‡Œè®¾ç½®äº†å˜æ¢çŸ©é˜µçš„å¤§å°ï¼Œä¹‹åçš„è¾“å‡ºå›¾åƒå’Œå˜æ¢çŸ©é˜µåŒæ ·å¤§
+	//int width = 1000; //æ˜ å°„å›¾åƒçš„å®½åº¦
+	//float s = 480.0f / 720.0f; //å›¾åƒé«˜å’Œå®½çš„æ¯”ä¾‹
 
 
-	//¼ÆËãÍ¼ÏñµÄ¸ß & ÖĞĞÄµãx¡¢y×ø±ê
+	//å°è¯•æ”¹å˜ç”Ÿæˆé±¼çœ¼å›¾åƒé•¿å®½æ¯”2018.7.10  éæ‰¹é‡å¤„ç†mainä¸­ä¹Ÿæœ‰å‚æ•°æ”¹åŠ¨
+	int width = 1224; //æ˜ å°„å›¾åƒçš„å®½åº¦
+	float s = 480.0f / 720.0f; //å›¾åƒé«˜å’Œå®½çš„æ¯”ä¾‹
+
+
+	//è®¡ç®—å›¾åƒçš„é«˜ & ä¸­å¿ƒç‚¹xã€yåæ ‡
 	int height = width * s;
 	int center_x = width / 2, center_y = height / 2;
-	//´´½¨mapx mapy ¾ùÎª32Î»¸¡µã
+	//åˆ›å»ºmapx mapy å‡ä¸º32ä½æµ®ç‚¹
 	mapx.create(height,width,CV_32F);
 	mapy.create(height,width,CV_32F);
 
 	for (int i = 0; i < height; ++i) 
 	{
-		//ÏñËØÈ·¶¨
+		//åƒç´ ç¡®å®š
 		float y = center_y - i;
-		float* px = (float*)(mapx.data + i * mapx.step);//µÚiĞĞµÚÒ»¸öÏñËØµÄµØÖ·
+		float* px = (float*)(mapx.data + i * mapx.step);//ç¬¬iè¡Œç¬¬ä¸€ä¸ªåƒç´ çš„åœ°å€
 		float* py = (float*)(mapy.data + i * mapy.step);
 		for (int j = 0; j < width; ++j) 
 		{
 			float x = j - center_x;
 			float nx,ny;
-			//ÓãÑÛÍ¼ÏñÉÏÔ²ĞÎÇøÓòÍâ±ß²»Ìî³äÍ¼ÏñÏñËØ
-			//Ô²ĞÎÇøÓòÄÚµ÷ÓÃPointMapÀûÓÃµÈ¾àÄ£ĞÍ½«»û±äÍ¼ÏñÉÏµÄµãÓ³Éäµ½µ¥Î»ÇòÃæ
-			if (sqrt(x*x + y*y) >= r)//Êµ¼ÊÉÏÕâ¶ÎifÎŞÓÃ£¬¿ÉÈ¥µô
+			//é±¼çœ¼å›¾åƒä¸Šåœ†å½¢åŒºåŸŸå¤–è¾¹ä¸å¡«å……å›¾åƒåƒç´ 
+			//åœ†å½¢åŒºåŸŸå†…è°ƒç”¨PointMapåˆ©ç”¨ç­‰è·æ¨¡å‹å°†ç•¸å˜å›¾åƒä¸Šçš„ç‚¹æ˜ å°„åˆ°å•ä½çƒé¢
+			if (sqrt(x*x + y*y) >= r)//å®é™…ä¸Šè¿™æ®µifæ— ç”¨ï¼Œå¯å»æ‰
 			{
 				nx = -1;
 				ny = -1;
@@ -184,12 +173,12 @@ void RectifyMap(Mat& mapx, Mat& mapy, float r)
 }
 
 /************************************************************************/
-/* ½ÃÕıÍ¼Ïñ   fsq2018.1.27                                     
+/* çŸ«æ­£å›¾åƒ   fsq2018.1.27                                     
 /************************************************************************/
 void UndisImage(Mat undistort_image, Mat& distort_image, Mat mapx, Mat mapy)
 {
 	assert(mapx.rows == mapy.rows && mapy.cols == mapy.cols);
-	//±ä»»Ç°Í¼Ïñ¸ß ¿í&ÖĞĞÄÎ»ÖÃ
+	//å˜æ¢å‰å›¾åƒé«˜ å®½&ä¸­å¿ƒä½ç½®
 	int height = undistort_image.rows;
 	int width = undistort_image.cols;
 	float cx = width / 2;
@@ -197,7 +186,7 @@ void UndisImage(Mat undistort_image, Mat& distort_image, Mat mapx, Mat mapy)
 	//cout << width << endl << height << endl;
 	//cx = 320; cy = 260;
 
-	//±ä»»ºóÍ¼Ïñ¸ß ¿í&ÖĞĞÄÎ»ÖÃ
+	//å˜æ¢åå›¾åƒé«˜ å®½&ä¸­å¿ƒä½ç½®
 	int distort_height = mapx.rows;
 	int distort_width = mapy.cols;
 	float center_x = distort_width / 2;
@@ -224,12 +213,12 @@ void UndisImage(Mat undistort_image, Mat& distort_image, Mat mapx, Mat mapy)
 			//int y = cy - pmapy[j];
 			int x = _mapx(i,j) + cx;
 			int y = cy - _mapy(i,j);
-			//ÓãÑÛÍ¼Ô²ĞÎÍâ²»Ìî³äÏñËØ
+			//é±¼çœ¼å›¾åœ†å½¢å¤–ä¸å¡«å……åƒç´ 
 			if (x - cx == -1 && cy - y == -1)
 			{
 				continue;
 			}
-			//ÈôÔ²ĞÎÇøÓòÄÚÄ³Î»ÖÃ£¬¶ÔÓ¦Ô­Í¼ÉÏ³¬³ö·¶Î§£¬²»Ìî³äÏñËØ£¬ÕâÊÇºÚ±ßµÄÓÉÀ´
+			//è‹¥åœ†å½¢åŒºåŸŸå†…æŸä½ç½®ï¼Œå¯¹åº”åŸå›¾ä¸Šè¶…å‡ºèŒƒå›´ï¼Œä¸å¡«å……åƒç´ ï¼Œè¿™æ˜¯é»‘è¾¹çš„ç”±æ¥
 			if ((x < 0 || x >= width || y < 0 || y >= height)) 
 			{
 				continue;
@@ -245,15 +234,15 @@ void UndisImage(Mat undistort_image, Mat& distort_image, Mat mapx, Mat mapy)
 
 
 /************************************************************************/
-/*ÓÃÓÚLabel×ª»»µÄ×ø±ê±ä»»£¨PointMapº¯ÊıµÄ·´º¯Êı£©fsq2018.2.4
-/*²ÎÊı£º
-/*    x,y : ÊäÈë²ÎÊı£¬Ğè×ª»»µÄÔ­Í¼×ø±ê
-/*    new_x,new_y : Êä³öÖµ£¬×ª»»ºóµÄÓãÑÛÍ¼Æ¬ÖĞÏàÓ¦µÄ×ø±ê
-/*    r : ÊäÈë²ÎÊı£¬ÓãÑÛ°ë¾¶
+/*ç”¨äºLabelè½¬æ¢çš„åæ ‡å˜æ¢ï¼ˆPointMapå‡½æ•°çš„åå‡½æ•°ï¼‰fsq2018.2.4
+/*å‚æ•°ï¼š
+/*    x,y : è¾“å…¥å‚æ•°ï¼Œéœ€è½¬æ¢çš„åŸå›¾åæ ‡
+/*    new_x,new_y : è¾“å‡ºå€¼ï¼Œè½¬æ¢åçš„é±¼çœ¼å›¾ç‰‡ä¸­ç›¸åº”çš„åæ ‡
+/*    r : è¾“å…¥å‚æ•°ï¼Œé±¼çœ¼åŠå¾„
 /************************************************************************/
 void LabelPoint(float x, float y, float& new_x, float& new_y, float r)
 {
-	float theta_max = PI / 2;	//ÓãÑÛ¾µÍ·°ëÊÓ³¡½Ç
+	float theta_max = PI / 2;	//é±¼çœ¼é•œå¤´åŠè§†åœºè§’
 	float d = sqrt(x*x + y*y);
 
 	float alpha(0);
@@ -270,56 +259,56 @@ void LabelPoint(float x, float y, float& new_x, float& new_y, float r)
 
 
 /************************************************************************/
-/* Label×ª»» fsq2018.2.4
-/* ²ÎÊı£º
-/*     x1,x2,y1,y2 : ÊäÈë²ÎÊı£¬Ô­Í¼LabelÖĞ2D¿ò×óÉÏ¡¢ÓÒÏÂ¶¥µã×ø±ê
-/*     bbx1,bbx2,bby1,bby2 : Êä³öÖµ£¬ÓãÑÛÍ¼Æ¬ÖĞÏàÓ¦µÄ2D¿ò×óÉÏ¡¢ÓÒÏÂ¶¥µã×ø±ê
+/* Labelè½¬æ¢ fsq2018.2.4
+/* å‚æ•°ï¼š
+/*     x1,x2,y1,y2 : è¾“å…¥å‚æ•°ï¼ŒåŸå›¾Labelä¸­2Dæ¡†å·¦ä¸Šã€å³ä¸‹é¡¶ç‚¹åæ ‡
+/*     bbx1,bbx2,bby1,bby2 : è¾“å‡ºå€¼ï¼Œé±¼çœ¼å›¾ç‰‡ä¸­ç›¸åº”çš„2Dæ¡†å·¦ä¸Šã€å³ä¸‹é¡¶ç‚¹åæ ‡
 /************************************************************************/
 void LabelTrans(float x1, float x2, float y1, float y2, float& bbx1, float& bbx2, float& bby1, float& bby2)
 {
 	float nx1, nx2, nx3, nx4, ny1, ny2, ny3, ny4;
 	//float cx = 616, cy = 186, center_x = 500, center_y = 333;
-	//³¢ÊÔ2018.7.10  ¸Ã¶ÎÓÃÀ´Ìæ»»ÉÏÒ»¾ä£¬ÒÔ±ãÔÚ¸ü¸ÄÉú³ÉÍ¼Æ¬³ß´çºóÏàÓ¦¸Ä±älabel±ä»»¼ÆËã
+	//å°è¯•2018.7.10  è¯¥æ®µç”¨æ¥æ›¿æ¢ä¸Šä¸€å¥ï¼Œä»¥ä¾¿åœ¨æ›´æ”¹ç”Ÿæˆå›¾ç‰‡å°ºå¯¸åç›¸åº”æ”¹å˜labelå˜æ¢è®¡ç®—
 	float cx = 616, cy = 186;	
-	int width = 1000; //Ó³ÉäÍ¼ÏñµÄ¿í¶È
-	float s = 480.0f / 720.0f; //Í¼Ïñ¸ßºÍ¿íµÄ±ÈÀı
+	int width = 1000; //æ˜ å°„å›¾åƒçš„å®½åº¦
+	float s = 480.0f / 720.0f; //å›¾åƒé«˜å’Œå®½çš„æ¯”ä¾‹
 	int height = width * s;
 	float center_x = width / 2, center_y = height / 2;
 
-    //½«Ô­Í¼×ø±êÏµÔ­µãÒÆÖÁÍ¼Æ¬ÖĞĞÄ£¬Îª¶ÔÓ¦Í¼Æ¬´¦Àí²¿·ÖµÄResize£¬×ö*2´¦Àí
+    //å°†åŸå›¾åæ ‡ç³»åŸç‚¹ç§»è‡³å›¾ç‰‡ä¸­å¿ƒï¼Œä¸ºå¯¹åº”å›¾ç‰‡å¤„ç†éƒ¨åˆ†çš„Resizeï¼Œåš*2å¤„ç†
 	x1 = 2*(x1 - cx);
 	x2 = 2*(x2 - cx);
 	y1 = 2*(cy - y1);
 	y2 = 2*(cy - y2);
-	//½«Ô­Í¼2D¿òËÄ¸ö¶¥µã×ø±ê×ª»»ÎªÓãÑÛÍ¼Æ¬µÄÏàÓ¦×ø±ê
-	LabelPoint(x1, y1, nx1, ny1, 200);//×óÉÏ
+	//å°†åŸå›¾2Dæ¡†å››ä¸ªé¡¶ç‚¹åæ ‡è½¬æ¢ä¸ºé±¼çœ¼å›¾ç‰‡çš„ç›¸åº”åæ ‡
+	LabelPoint(x1, y1, nx1, ny1, 200);//å·¦ä¸Š
 	nx1 = center_x + nx1;
 	ny1 = center_y - ny1;
 	//cout << nx1 << endl << ny1 << endl<<endl;
 	
-	LabelPoint(x2, y1, nx2, ny2, 200);//ÓÒÉÏ
+	LabelPoint(x2, y1, nx2, ny2, 200);//å³ä¸Š
 	nx2 = center_x + nx2;
 	ny2 = center_y - ny2;
 	//cout << nx2 << endl << ny2 << endl << endl;
 
-	LabelPoint(x1, y2, nx3, ny3, 200);//×óÏÂ
+	LabelPoint(x1, y2, nx3, ny3, 200);//å·¦ä¸‹
 	nx3 = center_x + nx3;
 	ny3 = center_y - ny3;
 	//cout << nx3 << endl << ny3 << endl << endl;	
 
-	LabelPoint(x2, y2, nx4, ny4, 200);//ÓÒÏÂ
+	LabelPoint(x2, y2, nx4, ny4, 200);//å³ä¸‹
 	nx4 = center_x + nx4;
 	ny4 = center_y - ny4;
 	//cout << nx4 << endl << ny4 << endl << endl;
 
-	// ±È½Ï×ø±êÖµ£¬ÖØĞÂÈ·¶¨ÓãÑÛÍ¼Æ¬µÄ2D¾ØĞÎ¿ò
+	// æ¯”è¾ƒåæ ‡å€¼ï¼Œé‡æ–°ç¡®å®šé±¼çœ¼å›¾ç‰‡çš„2DçŸ©å½¢æ¡†
 	bbx1 = min(nx1, nx3);
 	bby1 = min(ny1, ny2);
 	bbx2 = max(nx4, nx2);
 	bby2 = max(ny4, ny3);
 }
 
-//·ÇÅúÁ¿´¦Àí main
+//éæ‰¹é‡å¤„ç† main
 
 void main()
 {
@@ -327,14 +316,14 @@ void main()
 	Mat mapx, mapy, distort_image;
 	//imshow("origin_image", undistort_image);
 
-	//·Å´óÍ¼Æ¬£¬ÈÃÔ­Í¼Ó³Éäµ½µ¥Î»°ëÇòÉÏµÄ·¶Î§¸ü´ó£¬½ø¶øÈÃµ¥Î»°ëÇòÓ³Éäµ½ÓãÑÛÍ¼ÉÏµÄÃæ»ı¸ü´ó£¬Í¬Ñù¿É¼õÉÙºÚ±ß
+	//æ”¾å¤§å›¾ç‰‡ï¼Œè®©åŸå›¾æ˜ å°„åˆ°å•ä½åŠçƒä¸Šçš„èŒƒå›´æ›´å¤§ï¼Œè¿›è€Œè®©å•ä½åŠçƒæ˜ å°„åˆ°é±¼çœ¼å›¾ä¸Šçš„é¢ç§¯æ›´å¤§ï¼ŒåŒæ ·å¯å‡å°‘é»‘è¾¹
 	resize(undistort_image, undistort_image, Size(undistort_image.cols * 2, undistort_image.rows * 2));
 	//imshow("resized_image", undistort_image);
 
-	//ĞŞ¸ÄrÀ´µ÷ÕûÓãÑÛÍ¼ÏñÔ²°ë¾¶£¬Ö÷ÒªÓ°ÏìÊÇ¸Ä±äÁË½¹¾àf£¬¸Ä±äÁËÔ­Í¼Ó³Éäµ½µ¥Î»°ëÇòÉÏµÄ·¶Î§£¬½ø¶ø¿Éµ÷ÕûºÚ±ß
+	//ä¿®æ”¹ræ¥è°ƒæ•´é±¼çœ¼å›¾åƒåœ†åŠå¾„ï¼Œä¸»è¦å½±å“æ˜¯æ”¹å˜äº†ç„¦è·fï¼Œæ”¹å˜äº†åŸå›¾æ˜ å°„åˆ°å•ä½åŠçƒä¸Šçš„èŒƒå›´ï¼Œè¿›è€Œå¯è°ƒæ•´é»‘è¾¹
 	RectifyMap(mapx, mapy, 200);
 
-	//³¢ÊÔ¸Ä±äÉú³ÉÓãÑÛÍ¼Ïñ³¤¿í±È2018.7.10 RectifyMapÖĞÒ²ÓĞ²ÎÊı¸Ä¶¯
+	//å°è¯•æ”¹å˜ç”Ÿæˆé±¼çœ¼å›¾åƒé•¿å®½æ¯”2018.7.10 RectifyMapä¸­ä¹Ÿæœ‰å‚æ•°æ”¹åŠ¨
 	RectifyMap(mapx,mapy,800);
 	//imshow("mapx", mapx);
 	//imshow("mapy", mapy);
@@ -346,27 +335,27 @@ void main()
 }
 
 
-//ÅúÁ¿´¦Àímain fsq2018.2.4
+//æ‰¹é‡å¤„ç†main fsq2018.2.4
 /*
 int main()
 {
 	Mat undistort_image;
 	Mat mapx, mapy, distort_image;	
 	string fileName,fileName_label;
-	//Í¼Æ¬ÁĞ±íÎÄµµ&ÊäÈëÊä³öµØÖ·
-	char* filePath = "E:\\FishEye\\dir.txt";//ÅúÁ¿´¦ÀíÎÄ¼şÃû´¢´æÎÄµµµØÖ·
-	char* dir_in = "F:\\KITTI\\training\\image_2\\";//ÅúÁ¿´¦ÀíÊäÈëÎÄ¼şµØÖ·
-	char* dir_out = "E:\\FishEye_out\\image_2\\";//ÅúÁ¿´¦ÀíÎÄ¼şÊä³öµØÖ·
-	//LabelÁĞ±íÎÄµµ&ÊäÈëÊä³öµØÖ·
+	//å›¾ç‰‡åˆ—è¡¨æ–‡æ¡£&è¾“å…¥è¾“å‡ºåœ°å€
+	char* filePath = "E:\\FishEye\\dir.txt";//æ‰¹é‡å¤„ç†æ–‡ä»¶åå‚¨å­˜æ–‡æ¡£åœ°å€
+	char* dir_in = "F:\\KITTI\\training\\image_2\\";//æ‰¹é‡å¤„ç†è¾“å…¥æ–‡ä»¶åœ°å€
+	char* dir_out = "E:\\FishEye_out\\image_2\\";//æ‰¹é‡å¤„ç†æ–‡ä»¶è¾“å‡ºåœ°å€
+	//Labelåˆ—è¡¨æ–‡æ¡£&è¾“å…¥è¾“å‡ºåœ°å€
 	char* filePath_label = "E:\\FishEye\\dir_label.txt";
 	char* dir_label_in = "F:\\KITTI\\training\\label_2\\";
 	char* dir_label_out = "E:\\FishEye_out\\label_2\\";
 
-	//Í¼Æ¬×ª»»
+	//å›¾ç‰‡è½¬æ¢
 	
-	RectifyMap(mapx, mapy, 200);//¹¹½¨Í¼Æ¬Î»ÖÃÓ³Éä¾ØÕó
+	RectifyMap(mapx, mapy, 200);//æ„å»ºå›¾ç‰‡ä½ç½®æ˜ å°„çŸ©é˜µ
 
-	int counts = 0;//Êä³öÏÔÊ¾¼ÆÊı
+	int counts = 0;//è¾“å‡ºæ˜¾ç¤ºè®¡æ•°
 	cout << "Pic Trans" << endl;
 
 	ifstream inFile(filePath);
@@ -375,16 +364,16 @@ int main()
 		cerr << "Failed open the file" << endl;
 		return -1;
 	}
-	while (getline(inFile, fileName)) //°´ĞĞ¶ÁÈ¡ÎÄ¼şÃû
+	while (getline(inFile, fileName)) //æŒ‰è¡Œè¯»å–æ–‡ä»¶å
 	{
 		string str_in = dir_in + fileName;
 		string str_out = dir_out + fileName;
-		//´ı×ª»»Í¼Æ¬¶ÁÈë
+		//å¾…è½¬æ¢å›¾ç‰‡è¯»å…¥
 		undistort_image = imread(str_in, 1);
-		//Í¼Æ¬×ª»»
+		//å›¾ç‰‡è½¬æ¢
 		resize(undistort_image, undistort_image, Size(undistort_image.cols * 2, undistort_image.rows * 2));
 		UndisImage(undistort_image, distort_image, mapx, mapy);
-		//ÓãÑÛÍ¼Æ¬±£´æ & ¼ÆÊıÏÔÊ¾
+		//é±¼çœ¼å›¾ç‰‡ä¿å­˜ & è®¡æ•°æ˜¾ç¤º
 		imwrite(str_out, distort_image);
 		counts += 1;
 		cout << counts<<endl;
@@ -392,7 +381,7 @@ int main()
 	inFile.close();		
 	
 
-	//Label×ª»»
+	//Labelè½¬æ¢
 	cout << "Label Trans" << endl;
 	int counts_label = 0;
 
@@ -402,25 +391,25 @@ int main()
 		cerr << "Failed open the file" << endl;
 		return -1;
 	}
-	while (getline(inFile_label, fileName_label)) //°´ĞĞ¶ÁÈ¡ÎÄ¼şÃû
+	while (getline(inFile_label, fileName_label)) //æŒ‰è¡Œè¯»å–æ–‡ä»¶å
 	{
 		string str_label_in = dir_label_in + fileName_label;
 		string str_label_out = dir_label_out + fileName_label;
-		//ÊäÈë&Êä³ölabelÎÄ¼ş
+		//è¾“å…¥&è¾“å‡ºlabelæ–‡ä»¶
 		ifstream inLabel(str_label_in);
 		ofstream outLabel(str_label_out);
 
 		string label;
 		string str_type, str_truncated, str_occluded, str_alph, str_bbx1, str_bby1, str_bbx2, str_bby2;
-		//ÖğĞĞ¶ÁÈ¡ÊäÈëÎÄ¼şÊı¾İ
-		//ÌáÈ¡ËùĞèÊı¾İ£ºÀà±ğ¡¢2D¿ò×óÉÏ&ÓÒÏÂ¶¥µã×ø±ê
-		//½«×ø±ê×ª»»Éú³ÉÓãÑÛÍ¼Ïñ2D¿ò×ø±ê£¬Éú³ÉĞÂlabelÎÄ¼ş
+		//é€è¡Œè¯»å–è¾“å…¥æ–‡ä»¶æ•°æ®
+		//æå–æ‰€éœ€æ•°æ®ï¼šç±»åˆ«ã€2Dæ¡†å·¦ä¸Š&å³ä¸‹é¡¶ç‚¹åæ ‡
+		//å°†åæ ‡è½¬æ¢ç”Ÿæˆé±¼çœ¼å›¾åƒ2Dæ¡†åæ ‡ï¼Œç”Ÿæˆæ–°labelæ–‡ä»¶
 		while (getline(inLabel, label))
 		{
-			istringstream is(label);//°´¿Õ¸ñ·Ö¸îÊı¾İ£¬str_typeÀà±ğ£¬str_bbx1 str_bbx2 str_bby1 str_bby2Îª2D¿ò×óÉÏºÍÓÒÏÂ¶¥µã
+			istringstream is(label);//æŒ‰ç©ºæ ¼åˆ†å‰²æ•°æ®ï¼Œstr_typeç±»åˆ«ï¼Œstr_bbx1 str_bbx2 str_bby1 str_bby2ä¸º2Dæ¡†å·¦ä¸Šå’Œå³ä¸‹é¡¶ç‚¹
 			is>> str_type >> str_truncated >> str_occluded >> str_alph >> str_bbx1 >> str_bby1 >> str_bbx2 >> str_bby2;
 
-			float x1 = atof(str_bbx1.c_str());//Êı¾İÀàĞÍ×ª»»string --> float
+			float x1 = atof(str_bbx1.c_str());//æ•°æ®ç±»å‹è½¬æ¢string --> float
 			float x2 = atof(str_bbx2.c_str());
 			float y1 = atof(str_bby1.c_str());
 			float y2 = atof(str_bby2.c_str());
