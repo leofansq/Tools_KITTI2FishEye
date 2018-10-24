@@ -1,0 +1,16 @@
+﻿  fisheye.cpp
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(53): warning C4305: “初始化”: 从“double”到“float”截断
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(63): warning C4305: “=”: 从“double”到“float”截断
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(152): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(161): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(166): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(195): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(196): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(203): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(204): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(225): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(226): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(256): warning C4305: “初始化”: 从“double”到“float”截断
+e:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\fisheye-master\fisheye.cpp(261): warning C4305: “=”: 从“double”到“float”截断
+  fisheye-master.vcxproj -> E:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\x64\Debug\fisheye-master.exe
+  fisheye-master.vcxproj -> E:\0 大学\实验室\鱼眼数据集\fisheye_make\fisheye-master\x64\Debug\fisheye-master.pdb (Full PDB)

@@ -1,0 +1,13 @@
+﻿  fisheye.cpp
+fisheye.cpp(45): warning C4305: “初始化”: 从“double”到“float”截断
+fisheye.cpp(54): warning C4305: “=”: 从“double”到“float”截断
+fisheye.cpp(137): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+fisheye.cpp(144): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+fisheye.cpp(148): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+fisheye.cpp(176): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+fisheye.cpp(177): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+fisheye.cpp(182): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+fisheye.cpp(183): warning C4244: “初始化”: 从“int”转换到“float”，可能丢失数据
+fisheye.cpp(201): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+fisheye.cpp(202): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+LINK : fatal error LNK1181: 无法打开输入文件“opencv_ml249.lib”
